@@ -1,3 +1,3 @@
 @echo off
-uvicorn code_2(updated):app --reload
+uvicorn main:app --reload
 pause
