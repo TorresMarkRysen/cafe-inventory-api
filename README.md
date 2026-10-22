@@ -1,23 +1,52 @@
 # Cafe Order & Inventory REST API
 
-A persistent, relational backend API built with **FastAPI**, **SQLModel**, and **SQLite** to manage cafe catalog items, inventory levels, and order transactions.
+A persistent backend CRUD and inventory management API built with **FastAPI**, **SQLModel**, and **SQLite**. Designed to handle catalog items, manage stock levels, and log sales transactions.
+
+---
 
 ## Features
-- **Persistent Relational Storage:** Backed by SQLite via SQLModel with transactional session handling.
-- **Strict Data Validation:** Prevents negative inventory inputs, validates prices, and separates database entities from transient API request schemas.
+
+- **Persistent Storage:** SQLite database management using SQLModel ORM with context-managed sessions.
+- **Input Validation & Integrity:**
+  - Prevents invalid values using Pydantic Field constraints (e.g., non-negative stock, price > 0).
+  - Uses dedicated request schemas (`OrderRequest`, `RestockRequest`) for transactional actions.
 - **Business Logic Guards:**
-  - Prevents duplicate product entries (`409 Conflict`).
-  - Guards against orders exceeding current on-hand stock (`400 Bad Request`).
-  - Auto-calculates order totals and generates transaction sale records.
-- **Interactive Documentation:** Auto-generated Swagger UI for live testing.
+  - **Duplicate Prevention:** Rejects duplicate catalog entries (`409 Conflict`).
+  - **Stock Guards:** Prevents orders that exceed available on-hand inventory (`400 Bad Request`).
+  - **Automated Sales Logging:** Deducts inventory, auto-calculates total order cost, and creates a persistent sale record.
+  - **Resource Handling:** Validates item existence before updates or deletions (`404 Not Found`).
+- **Interactive Documentation:** Out-of-the-box Swagger UI (`/docs`) and ReDoc (`/redoc`) for endpoint testing.
+
+---
 
 ## Tech Stack
-- Python 3.10+
-- FastAPI
-- SQLModel / SQLAlchemy
-- SQLite
-- Uvicorn
 
+- **Language:** Python 3.10+
+- **Framework:** FastAPI
+- **ORM / Database:** SQLModel (SQLAlchemy) & SQLite
+- **ASGI Server:** Uvicorn
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description | Status Code |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/menu` | List all menu items and stock levels | `200 OK` |
+| `POST` | `/menu` | Add a new item to the menu | `201 Created` / `409 Conflict` |
+| `DELETE` | `/menu/{item_name}` | Remove an item from the menu | `200 OK` / `404 Not Found` |
+| `PATCH` | `/menu/restock` | Increment stock quantity for an item | `200 OK` / `404 Not Found` |
+| `POST` | `/order` | Place an order, decrement stock, log sale | `201 Created` / `400 Bad Request` |
+| `GET` | `/sale` | View historical order transactions | `200 OK` |
+
+---
+
+## Quickstart
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/TorresMarkRysen/cafe-inventory-api.git
+cd cafe-inventory-api
 ## Quickstart
 
 1. Install dependencies:
